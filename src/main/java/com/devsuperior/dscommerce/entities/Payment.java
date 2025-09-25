@@ -16,7 +16,7 @@ public class Payment {
     private Instant moment;
     
     @OneToOne
-    @JoinColumn(name = "order_id")
+    @MapsId
     private Order order;
 
     public Payment() {

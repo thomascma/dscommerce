@@ -13,7 +13,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    
+    @Column(columnDefinition = "TEXT")
     private String description;
+    
     private Double price;
     private String imgUrl;
     
@@ -24,6 +27,9 @@ public class Product {
         inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
+    
+    @OneToMany(mappedBy = "id.product")
+    private Set<OrderItem> items = new HashSet<>();
 
     public Product() {
     }
@@ -80,8 +86,8 @@ public class Product {
         return categories;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public Set<OrderItem> getItems() {
+        return items;
     }
 
     @Override
