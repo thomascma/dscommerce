@@ -58,4 +58,28 @@ public class ProductDTO {
     public List<CategoryDTO> getCategories() {
         return categories;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public void setCategories(List<CategoryDTO> categories) {
+        this.categories = categories;
+    }
 }
