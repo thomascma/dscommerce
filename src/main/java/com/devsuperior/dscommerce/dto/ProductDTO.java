@@ -1,15 +1,27 @@
 package com.devsuperior.dscommerce.dto;
 
 import com.devsuperior.dscommerce.entities.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDTO {
 
     private Long id;
+    
+    @Size(min = 3, max = 80, message = "Nome deve ter entre 3 e 80 caracteres")
+    @NotBlank(message = "Nome é obrigatório")
     private String name;
+    
+    @Size(min = 10, message = "Descrição deve ter pelo menos 10 caracteres")
+    @NotBlank(message = "Descrição é obrigatória")
     private String description;
+    
+    @Positive(message = "Preço deve ser positivo")
     private Double price;
+    
     private String imgUrl;
     private List<CategoryDTO> categories = new ArrayList<>();
 
