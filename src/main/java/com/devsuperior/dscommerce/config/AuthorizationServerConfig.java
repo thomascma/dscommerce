@@ -1,6 +1,7 @@
 package com.devsuperior.dscommerce.config;
 
 import com.devsuperior.dscommerce.config.customgrant.CustomPasswordAuthenticationConverter;
+import com.devsuperior.dscommerce.config.customgrant.CustomPasswordAuthenticationProvider;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,13 +28,14 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
-import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -54,14 +57,21 @@ public class AuthorizationServerConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
-                                                                     AuthenticationManager authenticationManager,
-                                                                     OAuth2AuthorizationService authorizationService,
-                                                                     OAuth2TokenGenerator<?> tokenGenerator) throws Exception {
+                                                                      AuthenticationManager authenticationManager,
+                                                                      OAuth2AuthorizationService authorizationService,
+                                                                      OAuth2TokenGenerator<?> tokenGenerator) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .tokenEndpoint(tokenEndpoint -> tokenEndpoint
-                        .accessTokenRequestConverter(new CustomPasswordAuthenticationConverter()));
-        return http.formLogin(Customizer.withDefaults()).build();
+                        .accessTokenRequestConverter(new CustomPasswordAuthenticationConverter())
+                        .authenticationProvider(new CustomPasswordAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator)));
+
+        // Configura o tratamento de exceção para retornar 401 para clientes de API em vez de redirecionar
+        http.exceptionHandling(exception -> exception
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+        );
+
+        return http.build();
     }
 
     @Bean

@@ -41,6 +41,10 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        // Adiciona permissão para os endpoints do OAuth2 na cadeia de filtros principal
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/oauth2/**").permitAll().anyRequest().authenticated());
+
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
