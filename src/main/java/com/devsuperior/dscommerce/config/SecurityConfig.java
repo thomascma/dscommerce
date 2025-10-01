@@ -3,8 +3,10 @@ package com.devsuperior.dscommerce.config;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,14 +39,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
-        // Adiciona permissão para os endpoints do OAuth2 na cadeia de filtros principal
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/oauth2/**").permitAll().anyRequest().authenticated());
-
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(PathRequest.toH2Console()).permitAll()
+            .anyRequest().authenticated());
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
