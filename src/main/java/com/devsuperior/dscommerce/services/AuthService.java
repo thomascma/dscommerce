@@ -7,7 +7,7 @@ import com.devsuperior.dscommerce.services.exceptions.ForbiddenException;
 @Service
 public class AuthService {
     @Autowired
-    public UserService userService;
+    private UserService userService;
 
     public void validateSelfOrAdmin(long userId) {
         User me = userService.authenticated();

@@ -38,9 +38,7 @@ public class ResourceServerConfig {
     SecurityFilterChain rsSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/products/**", "/categories/**").permitAll()
-            .anyRequest().authenticated());
+        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll());
         http.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
