@@ -1,7 +1,5 @@
 package com.devsuperior.dscommerce.controllers;
-
 import com.devsuperior.dscommerce.dto.UserDTO;
-import com.devsuperior.dscommerce.services.AuthService;
 import com.devsuperior.dscommerce.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
-
     @Autowired
     private UserService service;
 
-    @Autowired
-    private AuthService authService;
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping
-    public ResponseEntity<String> findAll() {
-        return ResponseEntity.ok("Admin access");
-    }
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_CLIENT')")
     @GetMapping(value = "/me")
     public ResponseEntity<UserDTO> getMe() {
         UserDTO dto = service.getMe();
